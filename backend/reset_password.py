@@ -13,16 +13,16 @@ def reset_admin():
         user.set_password('admin123')
         user.save()
         
-        # Ensure token exists
+        # Asegurar que el token exista
         token, _ = Token.objects.get_or_create(user=user)
         
-        print(f"User 'admin' password set to 'admin123'.")
+        print(f"Contraseña del usuario 'admin' establecida a 'admin123'.")
         print(f"Token: {token.key}")
         
     except User.DoesNotExist:
-        print("User 'admin' not found. Creating...")
+        print("Usuario 'admin' no encontrado. Creando...")
         User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
-        print("User 'admin' created with password 'admin123'")
+        print("Usuario 'admin' creado con contraseña 'admin123'")
 
 if __name__ == '__main__':
     reset_admin()

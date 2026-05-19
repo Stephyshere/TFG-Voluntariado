@@ -64,15 +64,22 @@ export default function Login() {
                                 onChange={(e) => setUsername(e.target.value)}
                                 placeholder="Nombre de usuario"
                             />
-                            <Input
-                                label="Contraseña"
-                                id="password"
-                                type="password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="••••••••"
-                            />
+                            <div className="flex flex-col">
+                                <Input
+                                    label="Contraseña"
+                                    id="password"
+                                    type="password"
+                                    required
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                />
+                                <div className="mt-2 text-right">
+                                    <Link to="/forgot-password" className="text-sm font-medium text-brand-600 hover:text-brand-500 transition-colors">
+                                        ¿Has olvidado tu contraseña?
+                                    </Link>
+                                </div>
+                            </div>
                         </div>
 
                         {error && (

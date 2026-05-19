@@ -7,12 +7,12 @@ from voluntariado.models import Pedania, Anuncio, Perfil
 from faker import Faker
 
 class Command(BaseCommand):
-    help = 'Populate the database with dummy data'
+    help = 'Poblar la base de datos con datos de prueba'
 
     def handle(self, *args, **kwargs):
         fake = Faker('es_ES')
 
-        # 1. Create Pedanias if they don't exist
+        # 1. Crear pedanias si no existen
         pedanias_names = [
             "Mazarrón", "Puerto de Mazarrón", "Bolnuevo", "Cañada de Gallego", 
             "Pastrana", "Saladillo", "Ifre-Cañada de Gallego", "Leiva", 
@@ -26,11 +26,11 @@ class Command(BaseCommand):
         
         self.stdout.write(self.style.SUCCESS(f'Checked/Created {len(pedanias)} Pedanías.'))
 
-        # 2. Create some users to be authors
+        # 2. Crear usuarios para ser autores de anuncios
         users = []
         for _ in range(5):
             username = fake.user_name()
-            # Ensure unique username
+            # Asegurar nombre de usuario unico
             while User.objects.filter(username=username).exists():
                 username = fake.user_name() + str(random.randint(1, 999))
                 
@@ -41,7 +41,7 @@ class Command(BaseCommand):
                 first_name=fake.first_name(),
                 last_name=fake.last_name()
             )
-            # Create Profile for user
+            # Crear perfil para el usuario
             Perfil.objects.create(
                 user=user,
                 rol=random.choice(['voluntario', 'organizacion']),
@@ -51,13 +51,13 @@ class Command(BaseCommand):
             )
             users.append(user)
         
-        # Ensure we have users
+        # Asegurar que haya usuarios disponibles
         if not users and User.objects.exists():
             users = list(User.objects.all())
 
         self.stdout.write(self.style.SUCCESS(f'Created/Loaded {len(users)} Users.'))
 
-        # 3. Create at least 1 FUTURE Activity per Pedania
+        # 3. Crear al menos 1 actividad FUTURA por pedania
         for pedania in pedanias:
             Anuncio.objects.create(
                 titulo=fake.sentence(nb_words=6),
@@ -70,7 +70,7 @@ class Command(BaseCommand):
                 usuario=random.choice(users),
             )
         
-        # Add a few more random ones
+        # Anadir algunas mas aleatorias
         for _ in range(5):
              Anuncio.objects.create(
                 titulo=fake.sentence(nb_words=6),
@@ -85,7 +85,7 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS(f'Created {len(pedanias) + 5} Future Activities (1 per Pedania + 5 random).'))
 
-        # 4. Create 5 PAST Activities (News)
+        # 4. Crear 5 actividades PASADAS (Noticias)
         for _ in range(5):
              Anuncio.objects.create(
                 titulo=fake.sentence(nb_words=6),

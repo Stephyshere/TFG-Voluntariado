@@ -51,18 +51,22 @@ class AnuncioSerializer(serializers.ModelSerializer):
     nombre_organizador = serializers.CharField(source='usuario.username', read_only=True)
     
     plazas_restantes = serializers.ReadOnlyField(source='plazas_disponibles')
+    inscripciones_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Anuncio
         fields = [
             'id', 'titulo', 'descripcion', 'imagen', 'fecha_publicacion', 
             'fecha_evento', 'etiqueta', 'estado', 'cupo_maximo', 
-            'plazas_restantes', 'pedanias', 'nombre_pedania', 
+            'plazas_restantes', 'inscripciones_count', 'pedanias', 'nombre_pedania', 
             'usuario', 'nombre_organizador', 'noticia_resumen', 'noticia_imagen', 'requerimientos'
         ]
         
-        # R -> Esto de aqui no se piden en el formulario
+        # Campos autoasignados, no se envian desde el formulario
         read_only_fields = ['usuario', 'fecha_publicacion']
+
+    def get_inscripciones_count(self, obj):
+        return obj.inscripciones.count()
 
 # -----------------------------------------------------------------------------
 # INSCRIPCIONES Y COMENTARIOS
@@ -71,14 +75,19 @@ class AnuncioSerializer(serializers.ModelSerializer):
 class InscripcionSerializer(serializers.ModelSerializer):
 
     titulo_anuncio = serializers.CharField(source='anuncio.titulo', read_only=True)
-    
+    nombre_usuario = serializers.CharField(source='usuario.username', read_only=True)
+    nombre_real = serializers.SerializerMethodField()
+
     class Meta:
         model = Inscripcion
-        fields = ['id', 'anuncio', 'titulo_anuncio', 'usuario', 'fecha_inscripcion', 'asistido']
+        fields = ['id', 'anuncio', 'titulo_anuncio', 'usuario', 'nombre_usuario', 'nombre_real', 'fecha_inscripcion', 'asistido']
         read_only_fields = ['usuario', 'fecha_inscripcion', 'asistido']
+        
+    def get_nombre_real(self, obj):
+        return f"{obj.usuario.first_name} {obj.usuario.last_name}".strip() or obj.usuario.username
 
-    # R -> Si está lleno... :
-    def validacion_lleno(self, data):
+    # Validacion de cupo maximo
+    def validate(self, data):
         anuncio = data['anuncio']
         if anuncio.cupo_maximo > 0 and anuncio.inscripciones.count() >= anuncio.cupo_maximo:
             raise serializers.ValidationError("Lo sentimos, este evento ya está completo.")

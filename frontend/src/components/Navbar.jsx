@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, User as UserIcon, LogOut, HeartHandshake, Search, Calendar, Newspaper, Users, Building2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/Button';
+import VerifiedBadge from './ui/VerifiedBadge';
 import axiosInstance from '../api/axiosInstance';
 
 export default function Navbar() {
@@ -180,8 +181,9 @@ export default function Navbar() {
                                             </div>
                                         )}
                                     </div>
-                                    <span className="hidden xl:inline text-sm font-medium text-gray-700 group-hover:text-brand-600">
+                                    <span className="hidden xl:inline text-sm font-medium text-gray-700 group-hover:text-brand-600 flex items-center gap-1">
                                         {user.first_name || user.username}
+                                        {user.rol?.toLowerCase() === 'organizacion' && <VerifiedBadge className="h-4 w-4" />}
                                     </span>
                                 </Link>
                                 {user.rol && user.rol.toLowerCase() === 'administrador' && (
@@ -289,7 +291,10 @@ export default function Navbar() {
                                         )}
                                     </div>
                                     <div className="ml-3">
-                                        <div className="text-base font-bold text-gray-800">{user.first_name || user.username}</div>
+                                        <div className="text-base font-bold text-gray-800 flex items-center gap-1">
+                                            {user.first_name || user.username}
+                                            {user.rol?.toLowerCase() === 'organizacion' && <VerifiedBadge className="h-4 w-4" />}
+                                        </div>
                                         <div className="text-xs text-gray-500 capitalize">{user.rol} • {user.asistencias_count || 0} asistencias</div>
                                     </div>
                                 </Link>

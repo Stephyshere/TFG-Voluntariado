@@ -96,5 +96,39 @@ def send_inscription_email(user_email, username, anuncio):
             fail_silently=True,
             html_message=html_message
         )
-    except Exception as e:
         print(f"Error enviando correo de inscripción: {e}")
+
+def send_password_reset_email(user_email, username, reset_url):
+    """
+    Envía un correo con el enlace para restablecer la contraseña.
+    """
+    if not user_email:
+        return
+
+    subject = 'Restablecer contraseña - Voluntariado'
+    message = (
+        f'Hola {username},\n\n'
+        f'Has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para crear una nueva:\n'
+        f'{reset_url}\n\n'
+        f'Si no has sido tú, ignora este correo.'
+    )
+    
+    html_message = (
+        f'<p>Hola {username},</p>'
+        f'<p>Has solicitado restablecer tu contraseña. Haz clic en el botón de abajo para crear una nueva:</p>'
+        f'<p><a href="{reset_url}" style="background-color: #7c3aed; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Restablecer contraseña</a></p>'
+        f'<p>Si no has solicitado este cambio, ignora este correo.</p>'
+    )
+
+    try:
+        send_mail(
+            subject,
+            message,
+            getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@voluntariado.com'),
+            [user_email],
+            fail_silently=True,
+            html_message=html_message
+        )
+    except Exception as e:
+        print(f"Error enviando correo de recuperación de contraseña: {e}")
+

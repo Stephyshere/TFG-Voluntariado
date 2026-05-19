@@ -68,29 +68,18 @@ def populate():
         pedania = Pedania.objects.get(nombre=act['pedania'])
         fecha = timezone.now() + timedelta(days=act['dias_futuro'])
         
+        # fecha_publicacion es auto_now_add, Django la asigna automaticamente
         Anuncio.objects.get_or_create(
             titulo=act['titulo'],
             defaults={
                 'descripcion': act['descripcion'],
                 'etiqueta': act['etiqueta'],
                 'fecha_evento': fecha,
-                'fecha_publicacion': timezone.now(),
                 'estado': 'publicado',
                 'cupo_maximo': 50,
                 'pedanias': pedania,
                 'usuario': admin,
-                # Nota: En un entorno real descargaríamos la imagen, aquí simulamos con URL si el modelo lo permite o dejamos campo vacío si es FileField estricto. 
-                # Como es ImageField, Django espera un archivo. Para simplificar este script sin descargas, 
-                # dejaremos la imagen vacía y usaremos el fallback del frontend, O 
-                # hackeamos un poco guardando la URL en un campo de texto si existiera, pero es ImageField.
-                # ESTRATEGIA: No asignamos imagen aquí, el frontend usará sus fallbacks o las URLs de Unsplash hardcodeadas en mi script si modifico el modelo.
-                # PERO el usuario pidió que aparezcan. 
-                # Voy a intentar asignar el nombre del archivo si ya existieran en media, pero no existen.
-                # Lo mejor para este demo rápido: dejar que el frontend maneje las imagenes por defecto si es null,
-                # O (mejor) actualizaré el frontend para que use estas URLs específicas si el campo imagen está vacío pero detecta que es un dato de prueba.
-                # ...
-                # Re-pensando: El modelo tiene ImageField. No puedo meter una URL string ahí directamente sin dar error.
-                # Solución: Dejaré imagen en None. El Frontend tiene un array de imagenes de fallback o usa la de Unsplash.
+                # ImageField no acepta URLs, el frontend usa imagenes de fallback si es null
             }
         )
         print(f"Actividad futura creada: {act['titulo']}")
@@ -131,8 +120,7 @@ def populate():
                 'descripcion': act['descripcion'],
                 'etiqueta': act['etiqueta'],
                 'fecha_evento': fecha,
-                'fecha_publicacion': timezone.now() - timedelta(days=act['dias_pasado'] + 5),
-                'estado': 'finalizado', # Mrcamos como finalizado
+                'estado': 'finalizado',
                 'cupo_maximo': 100,
                 'pedanias': pedania,
                 'usuario': admin,

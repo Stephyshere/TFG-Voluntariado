@@ -13,18 +13,18 @@ def create_admin():
     email = 'admin@example.com'
 
     if User.objects.filter(username=username).exists():
-        print(f"User {username} already exists. Resetting password.")
+        print(f"El usuario {username} ya existe. Restableciendo contraseña.")
         user = User.objects.get(username=username)
         user.set_password(password)
         user.save()
     else:
-        print(f"Creating user {username}...")
+        print(f"Creando usuario {username}...")
         user = User.objects.create_superuser(username=username, email=email, password=password)
         
-    # Ensure profile exists
+    # Asegurar que el perfil exista
     Perfil.objects.get_or_create(user=user, rol='Administrador', nombre_entidad='Ayuntamiento de Mazarrón')
     
-    print(f"Successfully configured user '{username}' with password '{password}'")
+    print(f"Usuario '{username}' configurado correctamente con contraseña '{password}'")
 
 if __name__ == '__main__':
     create_admin()

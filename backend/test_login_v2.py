@@ -1,7 +1,7 @@
 import os
 import django
 
-# Force correct settings
+# Forzar la configuracion correcta de Django
 os.environ['DJANGO_SETTINGS_MODULE'] = 'core.settings'
 django.setup()
 
@@ -16,20 +16,20 @@ def check_login():
     
     try:
         user = User.objects.get(username=username)
-        print(f"User exists. Active: {user.is_active}")
+        print(f"Usuario encontrado. Activo: {user.is_active}")
         if user.check_password(password):
-            print("Password matches.")
+            print("Contraseña coincide.")
         else:
-            print("Password DOES NOT match.")
+            print("La contraseña NO coincide.")
             user.set_password(password)
             user.save()
-            print("Password reset to 'admin123'.")
+            print("Contraseña restablecida a 'admin123'.")
     except User.DoesNotExist:
-        print("User not found.")
+        print("Usuario no encontrado.")
         User.objects.create_superuser(username, 'admin@test.com', password)
-        print("User created.")
+        print("Usuario creado.")
 
-    # Test via API Client (simulates request)
+    # Probar via API Client (simula una peticion HTTP)
     client = APIClient()
     response = client.post('/api/login/', {'username': username, 'password': password}, format='json')
     

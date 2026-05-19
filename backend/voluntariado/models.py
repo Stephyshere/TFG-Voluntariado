@@ -50,7 +50,7 @@ class Perfil(models.Model):
 
 class Pedania(models.Model):
 
-    # La famosa tabla paises version mazarron
+
     nombre = models.CharField(max_length=100)
 
     class Meta:
@@ -70,10 +70,11 @@ class Anuncio(models.Model):
         ('animales', 'Animales'),
         ('otros', 'Otros'),]
 
-    # R -> los borradores están ocultos
+    # Los borradores no se muestran publicamente
     ESTADO = [  
         ('borrador', 'Borrador'),
         ('publicado', 'Publicado'),
+        ('en_curso', 'En Curso'),
         ('finalizado', 'Finalizado'),
         ('cancelado', 'Cancelado'),
     ]
@@ -86,9 +87,9 @@ class Anuncio(models.Model):
     fecha_evento = models.DateTimeField()
 
     etiqueta = models.CharField(max_length=50, choices=ETIQUETAS, default='otros')
-    estado = models.CharField(max_length=20, choices=ESTADO, default='otros')
+    estado = models.CharField(max_length=20, choices=ESTADO, default='borrador')
 
-    cupo_maximo = models.PositiveBigIntegerField(default=0)
+    cupo_maximo = models.PositiveIntegerField(default=0)
     updated_at = models.DateTimeField(auto_now=True)
 
     # Campos para la "Noticia" una vez finalizada
@@ -97,7 +98,7 @@ class Anuncio(models.Model):
 
     requerimientos = models.TextField(blank=True, null=True, help_text="Requisitos para participar (ej: traer agua, guantes, mayor de edad...)")
 
-    #Creador + Lugar donde se hace
+
     pedanias = models.ForeignKey(Pedania, on_delete=models.CASCADE, related_name='anuncios')
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='anuncios_creados')
 
@@ -107,6 +108,12 @@ class Anuncio(models.Model):
     
     def __str__(self): 
         return self.titulo
+        
+    @property
+    def plazas_disponibles(self):
+        if self.cupo_maximo > 0:
+            return max(0, self.cupo_maximo - self.inscripciones.count())
+        return 999  # Ilimitado o valor grande por defecto
     
 class Inscripcion(models.Model):
 

@@ -12,26 +12,26 @@ def test_login():
     
     print(f"Testing login for user: {username}")
     
-    # 1. Check if user exists and password is correct internally
+    # 1. Comprobar si el usuario existe y la contraseña es correcta internamente
     try:
         user = User.objects.get(username=username)
-        print(f"User found: {user}")
+        print(f"Usuario encontrado: {user}")
         if user.check_password(password):
-            print("Password check passed internally.")
+            print("Verificacion de contraseña correcta.")
         else:
-            print("Password check FAILED internally.")
-            # Hard reset to be sure
+            print("Verificacion de contraseña FALLIDA.")
+            # Reinicio forzado para asegurar
             user.set_password(password)
             user.save()
-            print("Password forcibly reset.")
+            print("Contraseña restablecida forzosamente.")
     except User.DoesNotExist:
-        print("User does not exist!")
+        print("El usuario no existe.")
         return
 
-    # 2. Simulate API Request
+    # 2. Simular una peticion a la API
     from rest_framework.authtoken.models import Token
     token, _ = Token.objects.get_or_create(user=user)
-    print(f"Token for user: {token.key}")
+    print(f"Token del usuario: {token.key}")
 
 if __name__ == '__main__':
     test_login()

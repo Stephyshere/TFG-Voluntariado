@@ -13,9 +13,9 @@ def fix_admin_rol():
         p, created = Perfil.objects.get_or_create(user=u)
         p.rol = 'Administrador'
         p.save()
-        print("Admin role updated to 'Administrador'")
+        print("Rol de administrador actualizado a 'Administrador'")
     except User.DoesNotExist:
-        print("Admin user not found")
+        print("Usuario administrador no encontrado")
 
 if __name__ == '__main__':
     fix_admin_rol()

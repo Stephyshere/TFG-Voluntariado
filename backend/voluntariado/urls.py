@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import PedaniaViewSet, PerfilViewSet, AnuncioViewSet, InscripcionViewSet, ComentarioViewSet, RegisterView, CurrentUserView, CrearOrganizacionView, PatrocinadorViewSet, GlobalSearchView
+from .views import PedaniaViewSet, PerfilViewSet, AnuncioViewSet, InscripcionViewSet, ComentarioViewSet, RegisterView, CurrentUserView, CrearOrganizacionView, PatrocinadorViewSet, GlobalSearchView, PasswordResetRequestView, PasswordResetConfirmView
 from rest_framework.authtoken.views import obtain_auth_token
 
 router = DefaultRouter()
@@ -18,4 +18,6 @@ urlpatterns = [
     path('me/', CurrentUserView.as_view()),
     path('crear-organizacion/', CrearOrganizacionView.as_view(), name='crear_organizacion'),
     path('search/', GlobalSearchView.as_view(), name='global_search'),
+    path('password-reset/', PasswordResetRequestView.as_view(), name='password_reset'),
+    path('password-reset-confirm/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
 ]

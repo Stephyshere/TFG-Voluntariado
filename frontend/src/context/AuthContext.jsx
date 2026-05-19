@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
                     // profile contiene los datos extra { telefono, rol, ... }
                     setUser({ ...profile.user, ...profile });
                 } catch (error) {
-                    console.error("Error fetching user data", error);
+                    console.error("Error al obtener datos del usuario", error);
                     // Si falla el token (expirado, etc), hacemos logout
                     if (error.response && error.response.status === 401) {
                         logout();

@@ -6,6 +6,7 @@ import axiosInstance from '../api/axiosInstance';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { User, Mail, Calendar, MapPin, Phone, Briefcase, Camera, X, Edit2, ShieldCheck, Newspaper, Sparkles, Image as ImageIcon, Trash2, CheckCircle2 } from 'lucide-react';
+import VerifiedBadge from '../components/ui/VerifiedBadge';
 
 export default function Profile() {
     const { id } = useParams();
@@ -65,7 +66,8 @@ export default function Profile() {
                         axiosInstance.get('anuncios/'),
                         axiosInstance.get('pedanias/')
                     ]);
-                    const orgActs = anunciosRes.data.filter(a => a.usuario === userData.id);
+                    // Se compara con userData.user.id (ID del User) porque a.usuario es el ID del User
+                    const orgActs = anunciosRes.data.filter(a => a.usuario === userData.user.id);
                     setMyActivities(isOwnProfile ? orgActs : orgActs.filter(a => a.estado === 'publicado'));
                     setPedanias(pedaniasRes.data);
                 }
@@ -115,7 +117,7 @@ export default function Profile() {
             await axiosInstance.put('me/', data, { headers: { 'Content-Type': 'multipart/form-data' } });
             window.location.reload();
         } catch (error) {
-            console.error("Error updating profile", error);
+            console.error("Error al actualizar el perfil", error);
         } finally {
             setSaveLoading(false);
             setIsEditing(false);
@@ -322,8 +324,9 @@ export default function Profile() {
                         </div>
                         <div>
                             <div className="flex items-center gap-3">
-                                <h1 className="text-3xl font-bold text-gray-900">
+                                <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
                                     {profileUser.rol === 'organizacion' ? (profileUser.nombre_entidad || profileUser.username) : `${profileUser.first_name} ${profileUser.last_name}`}
+                                    {profileUser.rol === 'organizacion' && <VerifiedBadge className="h-6 w-6" />}
                                 </h1>
                             </div>
                             <div className="flex flex-wrap items-center gap-3 mt-1">

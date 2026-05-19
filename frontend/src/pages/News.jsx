@@ -24,7 +24,7 @@ export default function News() {
                 );
                 setNews(pastActivities);
             } catch (error) {
-                console.error("Error fetching news:", error);
+                console.error("Error al obtener noticias:", error);
             } finally {
                 setLoading(false);
             }

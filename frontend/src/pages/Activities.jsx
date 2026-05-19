@@ -24,7 +24,7 @@ export default function Activities() {
                     axiosInstance.get('pedanias/')
                 ]);
 
-                // Filter only Published (future) activities if backend doesn't filter
+                // Filtrar solo actividades publicadas (futuras) si el backend no filtra
                 const futureActivities = activitiesRes.data.filter(a => a.estado === 'publicado');
                 setActivities(futureActivities);
                 setFilteredActivities(futureActivities);

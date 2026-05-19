@@ -58,7 +58,7 @@ export default function Carousel() {
                     ]);
                 }
             } catch (error) {
-                console.error("Error loading carousel slides", error);
+                console.error("Error cargando las diapositivas del carrusel", error);
                 // Fallback en caso de error
                 setSlides([
                     {

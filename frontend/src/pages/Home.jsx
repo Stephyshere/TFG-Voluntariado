@@ -21,7 +21,7 @@ export default function Home() {
                 
                 setRecentActivities(response.data.slice(0, 3)); // Solo toma las primeras 3 actividades
             } catch (error) {
-                console.error("Error fetching activities:", error);
+                console.error("Error al obtener actividades:", error);
             } finally {
                 setLoading(false);
             }
@@ -41,7 +41,7 @@ export default function Home() {
     // Renderiza el carrusel y las actividades recientes en la pagina de inicio --ESTEFANIA
     return (
         <Layout>
-            <Carousel onMoreClick={scrollToActivities} />
+            <Carousel />
 
             <section ref={activitiesRef} className="py-20 bg-gray-50">
                 <div className="w-full px-6">
@@ -62,7 +62,7 @@ export default function Home() {
                                 <Card key={activity.id} className="hover:shadow-lg transition-shadow">
                                     <div className="h-48 overflow-hidden">
                                         <img
-                                            src={activity.imagen || "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"} // Fallback image if null
+                                            src={activity.imagen || "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"}
                                             alt={activity.titulo}
                                             className="w-full h-full object-cover"
                                         />
@@ -100,7 +100,7 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* Call to Action Section */}
+            {/* Seccion de llamada a la accion */}
             <section className="bg-indigo-700 py-16">
                 <div className="w-full px-6 text-center">
                     <h2 className="text-3xl font-extrabold text-white sm:text-4xl">

@@ -1,22 +1,25 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.conf import settings
 from .models import Pedania, Anuncio, Inscripcion, Comentario, Perfil, Patrocinadores
 from .serializers import PedaniaSerializer, AnuncioSerializer, InscripcionSerializer, ComentarioSerializer, PerfilSerializer, UserSerializer, PatrocinadoresSerializer
 from .permissions import IsOrganizacionOrAdmin, IsOwnerOrAdmin
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status, viewsets
-from django.contrib.auth.models import User
-from .utils import send_welcome_email, send_inscription_email
+from .utils import send_welcome_email, send_inscription_email, send_password_reset_email
 
-# R-> viewsets -> Nos crea automaticamente el get / post / get id / put / delete 
-# R-> IsAuthenticatedOrReadOnly -> Si vienes con Get | Pasa -> Si vienes con Post | No, registrate
+# Lectura publica, escritura requiere autenticacion
 class PedaniaViewSet(viewsets.ModelViewSet):
     queryset = Pedania.objects.all()
     serializer_class = PedaniaSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
-# R-> Cualquiera ve anuncios pero solo las organizaciones/admin crean y editan sus propios anuncios
+# Solo organizaciones y admins pueden crear/editar anuncios
 class AnuncioViewSet(viewsets.ModelViewSet):
     queryset = Anuncio.objects.all()
     serializer_class = AnuncioSerializer
@@ -25,18 +28,37 @@ class AnuncioViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(usuario=self.request.user)
 
+    @action(detail=True, methods=['post'], permission_classes=[IsOwnerOrAdmin])
+    def pasar_lista(self, request, pk=None):
+        anuncio = self.get_object()
+        inscripciones_ids = request.data.get('inscripciones_ids', [])
+        anuncio.inscripciones.update(asistido=False)
+        anuncio.inscripciones.filter(id__in=inscripciones_ids).update(asistido=True)
+        return Response({'mensaje': 'Asistencia actualizada correctamente'})
+
 class InscripcionViewSet(viewsets.ModelViewSet):
     serializer_class = InscripcionSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    # R-> Carga TODOS los anuncios y permite que segun la pedania cargue solo les de esa pedania
-    # R -> Cuando alguien envia el form Django lo intercepta.
-    # Coge al usuario que este logueado  y lo pone en el campo "usuario" del modelo
+    # Filtra inscripciones segun el rol del usuario autenticado
     def get_queryset(self):
         user = self.request.user
-        if user.is_staff:
-            return Inscripcion.objects.all()
-        return Inscripcion.objects.filter(usuario=user)
+        queryset = Inscripcion.objects.all()
+        
+        # Filtro opcional por anuncio
+        anuncio_id = self.request.query_params.get('anuncio')
+        if anuncio_id is not None:
+            queryset = queryset.filter(anuncio=anuncio_id)
+
+        if user.is_staff or getattr(getattr(user, 'perfil', None), 'rol', '').lower() == 'administrador':
+            return queryset
+            
+        # Si es organizacion, puede ver las inscripciones de sus propios anuncios
+        if getattr(getattr(user, 'perfil', None), 'rol', '').lower() in ['organización', 'organizacion']:
+            from django.db import models
+            return queryset.filter(models.Q(usuario=user) | models.Q(anuncio__usuario=user))
+            
+        return queryset.filter(usuario=user)
 
     def perform_create(self, serializer):
         inscripcion = serializer.save(usuario=self.request.user)
@@ -162,9 +184,11 @@ class CrearOrganizacionView(APIView):
             return Response({'mensaje': 'Organización creada exitosamente', 'user': serializer.data}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# Solo admins pueden gestionar patrocinadores, lectura publica
 class PatrocinadorViewSet(viewsets.ModelViewSet):
     queryset = Patrocinadores.objects.all()
     serializer_class = PatrocinadoresSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 class GlobalSearchView(APIView):
     """
@@ -220,3 +244,43 @@ class GlobalSearchView(APIView):
             })
 
         return Response({'results': results})
+
+class PasswordResetRequestView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        if email:
+            user = User.objects.filter(email=email).first()
+            if user:
+                uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+                token = default_token_generator.make_token(user)
+                frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:5173')
+                reset_url = f"{frontend_url}/reset-password/{uidb64}/{token}/"
+                send_password_reset_email(user.email, user.first_name or user.username, reset_url)
+        # Siempre retornamos éxito por seguridad (para no revelar si un email existe o no)
+        return Response({'mensaje': 'Si el email está registrado, recibirás un enlace para restablecer tu contraseña.'})
+
+class PasswordResetConfirmView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        uidb64 = request.data.get('uidb64')
+        token = request.data.get('token')
+        password = request.data.get('password')
+
+        if not (uidb64 and token and password):
+            return Response({'error': 'Faltan datos requeridos.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user is not None and default_token_generator.check_token(user, token):
+            user.set_password(password)
+            user.save()
+            return Response({'mensaje': 'Contraseña actualizada correctamente. Ya puedes iniciar sesión.'})
+        else:
+            return Response({'error': 'El enlace de recuperación es inválido o ha expirado.'}, status=status.HTTP_400_BAD_REQUEST)
