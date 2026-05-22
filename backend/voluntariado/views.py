@@ -89,13 +89,58 @@ class PerfilViewSet(viewsets.ModelViewSet):
         return Perfil.objects.all()
 
 from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate
+
+class LoginView(APIView):
+    """
+    Vista personalizada de login que reemplaza a obtain_auth_token.
+
+    Se establece authentication_classes=[] para evitar que SessionAuthentication
+    exija un token CSRF cuando el navegador tiene una cookie de sesion activa
+    (por ejemplo, tras visitar /admin/). Esto elimina el error intermitente
+    de 'CSRF token missing' que bloqueaba el login desde el frontend React.
+    """
+    authentication_classes = []
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        """Autentica al usuario y retorna su token de acceso.
+
+        Parameters:
+            request: Peticion HTTP con 'username' y 'password' en el body.
+
+        Returns:
+            Response con el token si las credenciales son validas,
+            o un error 400 si no lo son.
+        """
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        if not username or not password:
+            return Response(
+                {'non_field_errors': ['Debes proporcionar usuario y contrasena.']},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user = authenticate(request=request, username=username, password=password)
+
+        if user is None:
+            return Response(
+                {'non_field_errors': ['No se ha podido iniciar sesion con las credenciales proporcionadas.']},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        token, _created = Token.objects.get_or_create(user=user)
+        return Response({'token': token.key})
+
 
 class RegisterView(APIView):
-    # Corrección: Evitamos el error de "token CSRF missing" que ocurría esporádicamente
-    # (cada cierto tiempo) cuando el navegador del usuario tenía una cookie de sesión guardada
-    # (por ejemplo, por haber entrado al panel de administrador). 
-    # Al estar SessionAuthentication activa por defecto, exigía CSRF. Al limpiar las clases de
-    # autenticación para esta vista pública, solucionamos el problema permanentemente.
+    """
+    Vista de registro de nuevos usuarios voluntarios.
+
+    Se establece authentication_classes=[] para evitar que SessionAuthentication
+    exija un token CSRF en esta vista publica accesible sin autenticacion.
+    """
     authentication_classes = []
     permission_classes = [permissions.AllowAny]
 
@@ -246,6 +291,12 @@ class GlobalSearchView(APIView):
         return Response({'results': results})
 
 class PasswordResetRequestView(APIView):
+    """
+    Solicita el envio de un email de recuperacion de contrasena.
+
+    authentication_classes=[] evita el error de CSRF en esta vista publica.
+    """
+    authentication_classes = []
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
@@ -262,6 +313,12 @@ class PasswordResetRequestView(APIView):
         return Response({'mensaje': 'Si el email está registrado, recibirás un enlace para restablecer tu contraseña.'})
 
 class PasswordResetConfirmView(APIView):
+    """
+    Confirma el cambio de contrasena usando el token de recuperacion.
+
+    authentication_classes=[] evita el error de CSRF en esta vista publica.
+    """
+    authentication_classes = []
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):

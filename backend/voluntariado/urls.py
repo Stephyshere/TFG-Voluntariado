@@ -1,7 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import PedaniaViewSet, PerfilViewSet, AnuncioViewSet, InscripcionViewSet, ComentarioViewSet, RegisterView, CurrentUserView, CrearOrganizacionView, PatrocinadorViewSet, GlobalSearchView, PasswordResetRequestView, PasswordResetConfirmView
-from rest_framework.authtoken.views import obtain_auth_token
+from .views import PedaniaViewSet, PerfilViewSet, AnuncioViewSet, InscripcionViewSet, ComentarioViewSet, RegisterView, CurrentUserView, CrearOrganizacionView, PatrocinadorViewSet, GlobalSearchView, PasswordResetRequestView, PasswordResetConfirmView, LoginView
 
 router = DefaultRouter()
 router.register(r'pedanias', PedaniaViewSet)
@@ -13,7 +12,7 @@ router.register(r'patrocinadores', PatrocinadorViewSet, basename='patrocinador')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('login/', obtain_auth_token),
+    path('login/', LoginView.as_view()),
     path('register/', RegisterView.as_view()),
     path('me/', CurrentUserView.as_view()),
     path('crear-organizacion/', CrearOrganizacionView.as_view(), name='crear_organizacion'),
