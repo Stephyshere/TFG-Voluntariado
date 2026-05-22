@@ -5,8 +5,8 @@ import { Button } from '../components/ui/Button';
 import { Calendar, MapPin, Users, Clock, ArrowLeft, Share2, Sparkles, Newspaper, FileText, CheckSquare, PlayCircle, X } from 'lucide-react';
 import axiosInstance from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default function ActivityDetail() {
     const { id } = useParams();
@@ -22,7 +22,7 @@ export default function ActivityDetail() {
     const [selectedUsers, setSelectedUsers] = useState([]);
 
     // Comprueba si el usuario actual es propietario del anuncio o administrador
-    const isOwnerOrAdmin = user && (user.rol?.toLowerCase() === 'administrador' || user.id === activity?.usuario);
+    const isOwnerOrAdmin = user && (user.rol?.toLowerCase() === 'administrador' || user.user?.id === activity?.usuario);
 
     useEffect(() => {
         const fetchActivity = async () => {
@@ -36,7 +36,7 @@ export default function ActivityDetail() {
                     setHasJoined(isJoined);
 
                     // Cargar inscripciones si es propietario o administrador
-                    const isOwnerOrAdm = user && (user.rol?.toLowerCase() === 'administrador' || user.id === response.data.usuario);
+                    const isOwnerOrAdm = user && (user.rol?.toLowerCase() === 'administrador' || user.user?.id === response.data.usuario);
                     if (isOwnerOrAdm) {
                         const inscResponse = await axiosInstance.get(`inscripciones/?anuncio=${id}`);
                         setInscripciones(inscResponse.data);
@@ -89,7 +89,7 @@ export default function ActivityDetail() {
     //Descarga la lista de inscritos en formato PDF --ESTEFANIA
     const handleDownloadPDF = () => {
         const doc = new jsPDF();
-        doc.text(`Lista de Inscritos: ${activity.titulo}`, 14, 15); //Muestra el titulo de la actividad
+        doc.text(`Lista de Inscritos: ${activity.titulo}`, 14, 15);
         const tableData = inscripciones.map((insc, index) => [
             index + 1,
             insc.nombre_real,
@@ -97,7 +97,7 @@ export default function ActivityDetail() {
             insc.asistido ? "Sí" : "No"
         ]);
 
-        doc.autoTable({
+        autoTable(doc, {
             head: [['Nº', 'Nombre Real', 'Usuario', 'Asistió']],
             body: tableData,
             startY: 25,
@@ -252,6 +252,57 @@ export default function ActivityDetail() {
                                     </ul>
                                 </div>
                             )}
+
+                            {/* Listado de Participantes para Organizaciones/Admins */}
+                            {isOwnerOrAdmin && (
+                                <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                                            <Users className="h-6 w-6 text-brand-600" />
+                                            Listado de Participantes ({inscripciones.length})
+                                        </h2>
+                                        {inscripciones.length > 0 && (
+                                            <Button 
+                                                onClick={handleDownloadPDF} 
+                                                variant="outline" 
+                                                className="border-brand-500 text-brand-600 hover:bg-brand-50"
+                                            >
+                                                <FileText className="w-4 h-4 mr-2" />
+                                                Descargar PDF
+                                            </Button>
+                                        )}
+                                    </div>
+                                    
+                                    {inscripciones.length === 0 ? (
+                                        <p className="text-gray-500 text-center py-6">No hay participantes inscritos todavía.</p>
+                                    ) : (
+                                        <div className="overflow-x-auto">
+                                            <table className="min-w-full divide-y divide-gray-200">
+                                                <thead>
+                                                    <tr>
+                                                        <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Nombre</th>
+                                                        <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Usuario</th>
+                                                        <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Asistencia</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="bg-white divide-y divide-gray-100">
+                                                    {inscripciones.map((insc, index) => (
+                                                        <tr key={insc.id} className="hover:bg-gray-50/50 transition-colors">
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-950">{insc.nombre_real}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@{insc.nombre_usuario}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                                                <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${insc.asistido ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                                                                    {insc.asistido ? 'Asistió' : 'No confirmado'}
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
 
                         {/* Barra lateral */}
@@ -347,7 +398,7 @@ export default function ActivityDetail() {
                                                 </Button>
                                             )}
 
-                                            {(activity.estado === 'en_curso' || activity.estado === 'finalizado') && (
+                                            {(activity.estado === 'publicado' || activity.estado === 'en_curso' || activity.estado === 'finalizado') && (
                                                 <>
                                                     <Button onClick={handleDownloadPDF} variant="outline" className="w-full border-blue-500 text-blue-600 hover:bg-blue-50">
                                                         <FileText className="w-4 h-4 mr-2" />

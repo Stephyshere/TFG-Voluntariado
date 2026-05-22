@@ -245,20 +245,26 @@ export default function Profile() {
 
     const ActivityCard = ({ activity }) => (
         <div key={activity.id} className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 flex flex-col group hover:shadow-lg transition-all">
-            <div className="h-40 overflow-hidden relative">
+            <div className="h-40 overflow-hidden relative cursor-pointer" onClick={() => navigate(`/actividades/${activity.id}`)}>
                 <img src={activity.imagen || "https://via.placeholder.com/400x200?text=No+Image"} alt={activity.titulo} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
                 <div className={`absolute top-2 right-2 px-2 py-1 text-[10px] font-bold rounded-full text-white uppercase ${
                     activity.estado === 'publicado' ? 'bg-green-500' : 
+                    activity.estado === 'en_curso' ? 'bg-yellow-500' : 
                     activity.estado === 'finalizado' ? 'bg-blue-600' : 'bg-amber-500'}`}>
                     {activity.estado}
                 </div>
             </div>
             <div className="p-4 flex-grow flex flex-col">
-                <h3 className="font-bold text-lg mb-2 line-clamp-1">{activity.titulo}</h3>
+                <h3 className="font-bold text-lg mb-2 line-clamp-1 hover:text-brand-600 transition-colors cursor-pointer" onClick={() => navigate(`/actividades/${activity.id}`)}>
+                    {activity.titulo}
+                </h3>
                 <p className="text-gray-500 text-xs mb-4 line-clamp-2 flex-grow">{activity.descripcion}</p>
                 
                 {isOwnProfile ? (
                     <div className="space-y-2 mt-auto">
+                        <Button variant="gradient" size="sm" className="w-full py-1.5" onClick={() => navigate(`/actividades/${activity.id}`)}>
+                            Ver Detalles
+                        </Button>
                         <div className="flex gap-2">
                             <Button variant="outline" size="sm" className="flex-1 py-1" onClick={() => openEditActivityModal(activity)}>
                                 <Edit2 className="h-3.5 w-3.5 mr-1" /> Editar
@@ -268,7 +274,7 @@ export default function Profile() {
                             </Button>
                         </div>
                         {activity.estado !== 'finalizado' ? (
-                            <Button variant="gradient" size="sm" className="w-full py-1.5" onClick={() => handleFinalizeActivity(activity)}>
+                            <Button variant="ghost" size="sm" className="w-full py-1.5 text-blue-600 bg-blue-50 hover:bg-blue-100" onClick={() => handleFinalizeActivity(activity)}>
                                 <CheckCircle2 className="h-4 w-4 mr-2" /> Finalizar Actividad
                             </Button>
                         ) : (
@@ -551,7 +557,7 @@ export default function Profile() {
                                     <Input label="Cupo" name="cupo_maximo" type="number" min="0" value={activityForm.cupo_maximo} onChange={handleActivityInputChange} required />
                                 </div>
                                 <div className="grid grid-cols-3 gap-4">
-                                    <div className="space-y-1"><label className="text-sm font-medium text-gray-700">Estado</label><select name="estado" value={activityForm.estado} onChange={handleActivityInputChange} className="w-full border-gray-300 rounded-md shadow-sm"><option value="borrador">Borrador</option><option value="publicado">Publicado</option><option value="finalizado">Finalizado</option></select></div>
+                                    <div className="space-y-1"><label className="text-sm font-medium text-gray-700">Estado</label><select name="estado" value={activityForm.estado} onChange={handleActivityInputChange} className="w-full border-gray-300 rounded-md shadow-sm"><option value="borrador">Borrador</option><option value="publicado">Publicado</option><option value="en_curso">En Curso</option><option value="finalizado">Finalizado</option></select></div>
                                     <div className="space-y-1"><label className="text-sm font-medium text-gray-700">Etiqueta</label><select name="etiqueta" value={activityForm.etiqueta} onChange={handleActivityInputChange} className="w-full border-gray-300 rounded-md shadow-sm"><option value="medio_ambiente">Medio Ambiente</option><option value="educacion">Educación</option><option value="salud">Salud</option><option value="comunidad">Comunidad</option><option value="animales">Animales</option><option value="otros">Otros</option></select></div>
                                     <div className="space-y-1"><label className="text-sm font-medium text-gray-700">Pedanía</label><select name="pedanias" value={activityForm.pedanias} onChange={handleActivityInputChange} className="w-full border-gray-300 rounded-md shadow-sm" required><option value="">Selecciona...</option>{pedanias.map(p => (<option key={p.id} value={p.id}>{p.nombre}</option>))}</select></div>
                                 </div>
