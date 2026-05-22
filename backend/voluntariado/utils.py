@@ -96,7 +96,8 @@ def send_inscription_email(user_email, username, anuncio):
             fail_silently=True,
             html_message=html_message
         )
-        print(f"Error enviando correo de inscripción: {e}")
+    except Exception as e:
+        print(f"Error enviando correo de inscripcion: {e}")
 
 def send_password_reset_email(user_email, username, reset_url):
     """
