@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-    // La URL base de tu API de Django apuntando al puerto por defecto
-    baseURL: 'http://127.0.0.1:8000/api/', 
+    // Usamos una variable de entorno para la URL de la API, o localhost en desarrollo
+    baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/', 
     timeout: 5000, 
     headers: {
         'Content-Type': 'application/json',
