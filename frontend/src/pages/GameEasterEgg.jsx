@@ -607,7 +607,7 @@ export default function GameEasterEgg() {
             doc.setTextColor(148, 163, 184);
             doc.text('Coautor del Proyecto', pageWidth - 75, 181, { align: 'center' });
 
-            doc.save('Diploma_Honorifico_TFG_Mazarron.pdf');
+            doc.save('Diploma_Honorifico_TFG_Voluntariado.pdf');
             setPdfDownloaded(true);
         } catch (error) {
             console.error('Falla en la inicialización o renderizado del documento jsPDF:', error);
