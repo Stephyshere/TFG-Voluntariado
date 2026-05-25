@@ -72,7 +72,7 @@ export default function Login() {
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="••••••••"
+                                    placeholder="********"
                                 />
                                 <div className="mt-2 text-right">
                                     <Link to="/forgot-password" className="text-sm font-medium text-brand-600 hover:text-brand-500 transition-colors">

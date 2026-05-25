@@ -40,10 +40,10 @@ def insertar_datos():
         pedania, creada = Pedania.objects.get_or_create(nombre=nombre)
         
         if creada:
-            print(f"✅ Se ha añadido: {nombre}")
+            print(f"Se ha añadido: {nombre}")
             contador += 1
         else:
-            print(f"⚠️ Ya existía: {nombre}")
+            print(f"Ya existía: {nombre}")
 
     print("-" * 30)
     print(f"¡Proceso terminado! Se han insertado {contador} nuevas pedanías.")

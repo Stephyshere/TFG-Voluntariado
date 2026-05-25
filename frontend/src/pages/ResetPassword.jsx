@@ -86,7 +86,7 @@ export default function ResetPassword() {
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="••••••••"
+                                    placeholder="********"
                                 />
                                 <Input
                                     label="Confirmar nueva contraseña"
@@ -95,7 +95,7 @@ export default function ResetPassword() {
                                     required
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    placeholder="••••••••"
+                                    placeholder="********"
                                 />
                             </div>
 

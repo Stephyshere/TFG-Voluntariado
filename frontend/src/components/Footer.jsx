@@ -1,8 +1,43 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Facebook, Twitter, Instagram, Mail } from 'lucide-react';
 
+/**
+ * Componente que representa el pie de página de la aplicación.
+ * Proporciona enlaces de navegación, información de contacto, redes sociales
+ * y los logos de las entidades colaboradoras de Mazarrón.
+ * 
+ * @returns {React.ReactElement} El elemento JSX del pie de página.
+ */
 export default function Footer() {
+    const navigate = useNavigate();
+
+    // Referencias para realizar el seguimiento discreto de clics para el easter egg
+    const clickCountRef = useRef(0);
+    const lastClickTimeRef = useRef(0);
+
+    /**
+     * Controlador de clics consecutivos en el copyright del pie de página.
+     * Si el usuario realiza 5 clics consecutivos en menos de 3 segundos, se le redirige al minijuego oculto.
+     * 
+     * @returns {void}
+     */
+    const handleFooterClick = () => {
+        const now = Date.now();
+        // Si transcurren más de 3 segundos desde la última pulsación, reiniciar el acumulador
+        if (now - lastClickTimeRef.current > 3000) {
+            clickCountRef.current = 1;
+        } else {
+            clickCountRef.current += 1;
+        }
+        lastClickTimeRef.current = now;
+
+        // Se requieren 5 clics acumulados seguidos para detonar la redirección
+        if (clickCountRef.current >= 5) {
+            clickCountRef.current = 0;
+            navigate('/relax');
+        }
+    };
     return (
         <footer className="bg-white border-t border-gray-100">
             <div className="w-full py-12 px-6">
@@ -12,6 +47,43 @@ export default function Footer() {
                         <p className="mt-4 text-base text-gray-500">
                             Conectando personas con causas que importan. Únete a nosotros para hacer una diferencia en tu comunidad hoy mismo.
                         </p>
+                        <div className="mt-8">
+                            <span className="text-xs font-semibold text-gray-400 tracking-wider uppercase block mb-3">Colaboran</span>
+                            <div className="flex flex-wrap gap-4">
+                                <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 hover:border-brand-200 transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-center h-20 w-36 group cursor-pointer">
+                                    <img 
+                                        src="/images/logo-instituto.png" 
+                                        alt="Logo Instituto" 
+                                        className="max-h-full max-w-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                                        onError={(e) => {
+                                            e.target.style.display = 'none';
+                                            if (e.target.nextSibling) {
+                                                e.target.nextSibling.style.display = 'flex';
+                                            }
+                                        }}
+                                    />
+                                    <div className="hidden text-xs text-gray-400 font-semibold text-center items-center justify-center h-full w-full uppercase tracking-wider">
+                                        IES Mazarrón
+                                    </div>
+                                </div>
+                                <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 hover:border-brand-200 transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-center h-20 w-36 group cursor-pointer">
+                                    <img 
+                                        src="/images/logo-ayuntamiento.png" 
+                                        alt="Logo Ayuntamiento" 
+                                        className="max-h-full max-w-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                                        onError={(e) => {
+                                            e.target.style.display = 'none';
+                                            if (e.target.nextSibling) {
+                                                e.target.nextSibling.style.display = 'flex';
+                                            }
+                                        }}
+                                    />
+                                    <div className="hidden text-xs text-gray-400 font-semibold text-center items-center justify-center h-full w-full uppercase tracking-wider">
+                                        Ayuntamiento
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div>
                         <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase">Navegación</h3>
@@ -58,7 +130,12 @@ export default function Footer() {
                     </div>
                 </div>
                 <div className="mt-8 border-t border-gray-100 pt-8 text-center">
-                    <p className="text-base text-gray-400">&copy; 2026 Plataforma de Voluntariado. Hecho por Estefania y Ruben. Todos los derechos reservados.</p>
+                    <p 
+                        onClick={handleFooterClick}
+                        className="text-base text-gray-400 select-none cursor-default"
+                    >
+                        &copy; 2026 Plataforma de Voluntariado. Hecho por Estefania y Ruben. Todos los derechos reservados.
+                    </p>
                 </div>
             </div>
         </footer>

@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/Button';
 import VerifiedBadge from './ui/VerifiedBadge';
 import axiosInstance from '../api/axiosInstance';
+import { getFunnyDefaultAvatar } from '../utils/avatar';
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
@@ -132,7 +133,7 @@ export default function Navbar() {
                                                         </div>
                                                         <div className="text-xs text-gray-500 flex items-center gap-2">
                                                             <span className="capitalize">{result.type}</span>
-                                                            <span>•</span>
+                                                            <span>|</span>
                                                             <span className="truncate">{result.subtitle}</span>
                                                         </div>
                                                     </div>
@@ -173,13 +174,11 @@ export default function Navbar() {
                             <div className="flex items-center space-x-6">
                                 <Link to="/perfil" className="flex items-center gap-3 group hover:bg-gray-50 p-1 pr-3 rounded-full transition-all">
                                     <div className={`h-10 w-10 rounded-full border-2 border-white bg-white overflow-hidden shadow-sm transition-all duration-300 ${user.marco && user.marco !== 'ninguno' ? `frame-${user.marco} scale-95` : ''}`}>
-                                        {user.foto ? (
-                                            <img src={user.foto} alt="Perfil" className="h-full w-full object-cover" />
-                                        ) : (
-                                            <div className="h-full w-full bg-gray-200 flex items-center justify-center">
-                                                <UserIcon className="h-5 w-5 text-gray-400" />
-                                            </div>
-                                        )}
+                                        <img 
+                                            src={user.foto || getFunnyDefaultAvatar(user.id)} 
+                                            alt="Perfil" 
+                                            className="h-full w-full object-cover" 
+                                        />
                                     </div>
                                     <span className="hidden xl:inline text-sm font-medium text-gray-700 group-hover:text-brand-600 flex items-center gap-1">
                                         {user.first_name || user.username}
@@ -282,20 +281,18 @@ export default function Navbar() {
                             <div className="px-4">
                                 <Link to="/perfil" onClick={() => setIsOpen(false)} className="flex items-center p-3 bg-gray-50 rounded-xl mb-4 border border-gray-100">
                                     <div className={`h-12 w-12 rounded-full border-2 border-white bg-white overflow-hidden shadow-sm transition-all duration-300 ${user.marco && user.marco !== 'ninguno' ? `frame-${user.marco} scale-95` : ''}`}>
-                                        {user.foto ? (
-                                            <img src={user.foto} alt="Perfil" className="h-full w-full object-cover" />
-                                        ) : (
-                                            <div className="h-full w-full bg-gray-200 flex items-center justify-center">
-                                                <UserIcon className="h-6 w-6 text-gray-400" />
-                                            </div>
-                                        )}
+                                        <img 
+                                            src={user.foto || getFunnyDefaultAvatar(user.id)} 
+                                            alt="Perfil" 
+                                            className="h-full w-full object-cover" 
+                                        />
                                     </div>
                                     <div className="ml-3">
                                         <div className="text-base font-bold text-gray-800 flex items-center gap-1">
                                             {user.first_name || user.username}
                                             {user.rol?.toLowerCase() === 'organizacion' && <VerifiedBadge className="h-4 w-4" />}
                                         </div>
-                                        <div className="text-xs text-gray-500 capitalize">{user.rol} • {user.asistencias_count || 0} asistencias</div>
+                                        <div className="text-xs text-gray-500 capitalize">{user.rol} | {user.asistencias_count || 0} asistencias</div>
                                     </div>
                                 </Link>
                                 <div className="space-y-2">

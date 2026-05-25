@@ -7,6 +7,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { User, Mail, Calendar, MapPin, Phone, Briefcase, Camera, X, Edit2, ShieldCheck, Newspaper, Sparkles, Image as ImageIcon, Trash2, CheckCircle2 } from 'lucide-react';
 import VerifiedBadge from '../components/ui/VerifiedBadge';
+import { getFunnyDefaultAvatar } from '../utils/avatar';
 
 export default function Profile() {
     const { id } = useParams();
@@ -84,9 +85,9 @@ export default function Profile() {
     useEffect(() => {
         if (profileUser && isOwnProfile) {
             setFormData({
-                first_name: profileUser.first_name || '',
-                last_name: profileUser.last_name || '',
-                email: profileUser.email || '',
+                first_name: profileUser.user?.first_name || '',
+                last_name: profileUser.user?.last_name || '',
+                email: profileUser.user?.email || '',
                 telefono: profileUser.telefono || '',
                 fecha_nacimiento: profileUser.fecha_nacimiento || '',
                 nombre_entidad: profileUser.nombre_entidad || '',
@@ -313,13 +314,11 @@ export default function Profile() {
                         <div className="relative flex justify-between items-end -mt-12 mb-6">
                             <div className="relative">
                                 <div className={`h-28 w-28 rounded-full border-4 border-white bg-white overflow-hidden shadow-md transition-all duration-300 ${profileUser.marco && profileUser.marco !== 'ninguno' ? `frame-${profileUser.marco}` : ''}`}>
-                                    {profileUser.foto ? (
-                                        <img src={profileUser.foto} alt="Perfil" className="h-full w-full object-cover" />
-                                    ) : (
-                                        <div className="h-full w-full bg-gray-200 flex items-center justify-center">
-                                            <User className="h-12 w-12 text-gray-400" />
-                                        </div>
-                                    )}
+                                    <img 
+                                        src={profileUser.foto || getFunnyDefaultAvatar(profileUser.user?.id)} 
+                                        alt="Perfil" 
+                                        className="h-full w-full object-cover" 
+                                    />
                                 </div>
                             </div>
                             {isOwnProfile && (
@@ -331,12 +330,12 @@ export default function Profile() {
                         <div>
                             <div className="flex items-center gap-3">
                                 <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-                                    {profileUser.rol === 'organizacion' ? (profileUser.nombre_entidad || profileUser.username) : `${profileUser.first_name} ${profileUser.last_name}`}
+                                    {profileUser.rol === 'organizacion' ? (profileUser.nombre_entidad || profileUser.user?.username) : `${profileUser.user?.first_name || ''} ${profileUser.user?.last_name || ''}`.trim() || profileUser.user?.username}
                                     {profileUser.rol === 'organizacion' && <VerifiedBadge className="h-6 w-6" />}
                                 </h1>
                             </div>
                             <div className="flex flex-wrap items-center gap-3 mt-1">
-                                <p className="text-gray-500 font-medium">@{profileUser.username} • {profileUser.rol.charAt(0).toUpperCase() + profileUser.rol.slice(1)}</p>
+                                <p className="text-gray-500 font-medium">@{profileUser.user?.username} | {profileUser.rol.charAt(0).toUpperCase() + profileUser.rol.slice(1)}</p>
                                 {profileUser.rol === 'voluntario' && (
                                     <span className={`text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider ${
                                         profileUser.marco === 'oro' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
@@ -509,7 +508,11 @@ export default function Profile() {
                                 <div className="flex justify-center mb-6">
                                     <div className="relative h-24 w-24">
                                         <div className={`h-24 w-24 rounded-full overflow-hidden border-2 border-gray-200 ${profileUser.marco && profileUser.marco !== 'ninguno' ? `frame-${profileUser.marco} scale-95` : ''}`}>
-                                            {previewImage ? <img src={previewImage} alt="Preview" className="h-full w-full object-cover" /> : profileUser.foto ? <img src={profileUser.foto} className="h-full w-full object-cover" /> : <div className="bg-gray-100 h-full w-full flex items-center justify-center"><User /></div>}
+                                            <img 
+                                                src={previewImage || profileUser.foto || getFunnyDefaultAvatar(profileUser.user?.id)} 
+                                                alt="Vista previa" 
+                                                className="h-full w-full object-cover" 
+                                            />
                                         </div>
                                         <label className="absolute bottom-0 right-0 bg-brand-600 text-white p-1.5 rounded-full cursor-pointer hover:bg-brand-700 shadow-sm">
                                             <Camera className="h-4 w-4" /><input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />

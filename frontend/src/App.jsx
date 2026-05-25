@@ -11,6 +11,7 @@ import Profile from './pages/Profile';
 import CrearOrganizacion from './pages/CrearOrganizacion';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import GameEasterEgg from './pages/GameEasterEgg';
 import './App.css';
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
           <Route path="/crear-organizacion" element={<CrearOrganizacion />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:uidb64/:token" element={<ResetPassword />} />
+          <Route path="/relax" element={<GameEasterEgg />} />
         </Routes>
       </Router>
     </AuthProvider>

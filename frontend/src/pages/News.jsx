@@ -87,7 +87,7 @@ export default function News() {
                                             </span>
                                             <Link to={`/actividades/${item.id}`}>
                                                 <Button variant="ghost" size="sm" className="text-gray-500 hover:text-brand-600 p-0">
-                                                    Leer más →
+                                                    Leer más
                                                 </Button>
                                             </Link>
                                         </div>

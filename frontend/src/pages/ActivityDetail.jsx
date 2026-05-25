@@ -31,14 +31,12 @@ export default function ActivityDetail() {
                 setActivity(response.data);
 
                 if (token) {
-                    const inscripcionesParams = await axiosInstance.get('inscripciones/');
-                    const isJoined = inscripcionesParams.data.some(insc => insc.anuncio === parseInt(id));
+                    const isOwnerOrAdm = user && (user.rol?.toLowerCase() === 'administrador' || user.user?.id === response.data.usuario);
+                    const inscResponse = await axiosInstance.get(`inscripciones/?anuncio=${id}`);
+                    const isJoined = inscResponse.data.some(insc => insc.usuario === user.user?.id);
                     setHasJoined(isJoined);
 
-                    // Cargar inscripciones si es propietario o administrador
-                    const isOwnerOrAdm = user && (user.rol?.toLowerCase() === 'administrador' || user.user?.id === response.data.usuario);
                     if (isOwnerOrAdm) {
-                        const inscResponse = await axiosInstance.get(`inscripciones/?anuncio=${id}`);
                         setInscripciones(inscResponse.data);
                     }
                 }
