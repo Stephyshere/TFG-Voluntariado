@@ -382,7 +382,7 @@ def send_attendance_email(
 
     body_content = f'''
     <p>Hola, <strong>{username}</strong>:</p>
-    <p>Queremos expresarte nuestro **agradecimiento mas sincero** por haber asistido y colaborado con entusiasmo en la actividad <strong>"{anuncio.titulo}"</strong> que tuvo lugar el pasado {fecha_evento_str}.</p>
+    <p>Queremos expresarte nuestro <strong>agradecimiento mas sincero</strong> por haber asistido y colaborado con entusiasmo en la actividad <strong>"{anuncio.titulo}"</strong> que tuvo lugar el pasado {fecha_evento_str}.</p>
     <p>Tu implicacion activa, tiempo y dedicacion son de un valor incalculable para mejorar el dia a dia de nuestras pedanias. Gracias a personas comprometidas como tu, logramos construir una comunidad mas unida, solidaria y fuerte.</p>
     <p>Ademas, te recordamos que al registrar asistencias confirmadas en la plataforma, avanzas en tu historial y sumas puntos para desbloquear reconocimientos y medallas (bronce, plata u oro) visibles en tu perfil publico.</p>
     <p>¡Esperamos coincidir contigo en proximas iniciativas! Tu ayuda marca la diferencia.</p>

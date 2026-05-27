@@ -21,17 +21,28 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 
-# Clave secreta del proyecto (en produccion se carga desde variable de entorno)
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure--j!z*bzy2vx@bc=nf-m8z5skrggpwb&i8+xk#r1u2)+)ute!fa')
+# Clave secreta del proyecto (en produccion se carga desde variable de entorno).
+# En desarrollo local se usa un valor por defecto. En produccion DEBE estar definida
+# como variable de entorno para garantizar la seguridad del sistema.
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY',
+    'django-insecure--j!z*bzy2vx@bc=nf-m8z5skrggpwb&i8+xk#r1u2)+)ute!fa'
+)
 
-# Modo depuracion (desactivar en produccion)
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+# Modo depuracion (desactivado por defecto para seguridad en produccion).
+# Activar solo en desarrollo local con la variable de entorno DEBUG=True.
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.render.com']
 
+# Permitir hosts adicionales del servidor de despliegue (Render, Dokploy, etc.)
 render_external_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if render_external_hostname:
     ALLOWED_HOSTS.append(render_external_hostname)
+
+extra_hosts = os.environ.get('ALLOWED_HOSTS_EXTRA', '')
+if extra_hosts:
+    ALLOWED_HOSTS.extend(host.strip() for host in extra_hosts.split(',') if host.strip())
 
 
 # Definicion de aplicaciones instaladas
@@ -152,7 +163,35 @@ STORAGES = {
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-CORS_ALLOW_ALL_ORIGINS = True
+
+# URL del frontend (para enlaces en emails de bienvenida, reset de contrasena, etc.).
+# En desarrollo apunta a localhost, en produccion se carga desde variable de entorno.
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
+
+# Configuracion de CORS: solo los origenes autorizados pueden hacer peticiones.
+# CORS_ALLOW_ALL_ORIGINS se desactiva por seguridad en produccion.
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get(
+        'CORS_ALLOWED_ORIGINS',
+        'http://localhost:5173,http://127.0.0.1:5173'
+    ).split(',')
+    if origin.strip()
+]
+
+# En desarrollo local se puede activar CORS_ALLOW_ALL_ORIGINS=True desde el .env
+CORS_ALLOW_ALL_ORIGINS = os.environ.get('CORS_ALLOW_ALL_ORIGINS', 'False') == 'True'
+
+# Origenes de confianza para solicitudes CSRF (necesario cuando frontend y backend
+# estan en dominios diferentes o se usa HTTPS)
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get(
+        'CSRF_TRUSTED_ORIGINS',
+        'http://localhost:5173,http://127.0.0.1:5173'
+    ).split(',')
+    if origin.strip()
+]
 
 # Configuracion del backend de email.
 # En desarrollo local usa la consola (imprime los emails en la terminal).
@@ -162,6 +201,14 @@ EMAIL_BACKEND = os.environ.get(
     'django.core.mail.backends.console.EmailBackend'
 )
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@voluntariado.com')
+
+# Configuracion SMTP para produccion (solo aplica si EMAIL_BACKEND es SMTP).
+# Se cargan desde variables de entorno para no exponer credenciales.
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
 
 # Configuracion DEFAULT_AUTO_FIELD para evitar warnings de Django
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

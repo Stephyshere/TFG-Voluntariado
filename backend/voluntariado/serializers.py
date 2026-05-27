@@ -31,6 +31,7 @@ class PerfilSerializer(serializers.ModelSerializer):
     class Meta:
         model = Perfil
         fields = ['id', 'user', 'rol', 'nombre_entidad', 'telefono', 'foto', 'fecha_nacimiento', 'asistencias_count', 'marco']
+        read_only_fields = ['rol']
 
 # -----------------------------------------------------------------------------
 # UTILIDADES (Pedanías)

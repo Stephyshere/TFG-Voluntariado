@@ -69,7 +69,7 @@ class AnuncioViewSet(viewsets.ModelViewSet):
             return Anuncio.objects.all()
 
         # Las organizaciones ven todos los anuncios que no sean borradores más sus propios borradores
-        if getattr(getattr(user, 'perfil', None), 'rol', '').lower() in ['organización', 'organizacion']:
+        if getattr(getattr(user, 'perfil', None), 'rol', '').lower() == 'organizacion':
             return Anuncio.objects.filter(Q(usuario=user) | ~Q(estado='borrador'))
 
         # Los voluntarios únicamente pueden ver anuncios que no sean borradores
@@ -160,7 +160,7 @@ class InscripcionViewSet(viewsets.ModelViewSet):
             return queryset
             
         # Si es organizacion, puede ver las inscripciones de sus propios anuncios
-        if getattr(getattr(user, 'perfil', None), 'rol', '').lower() in ['organización', 'organizacion']:
+        if getattr(getattr(user, 'perfil', None), 'rol', '').lower() == 'organizacion':
             return queryset.filter(Q(usuario=user) | Q(anuncio__usuario=user))
             
         return queryset.filter(usuario=user)
@@ -478,7 +478,7 @@ class GlobalSearchView(APIView):
                 'title': p.nombre_entidad if p.rol == 'organizacion' else f"{p.user.first_name} {p.user.last_name}".strip() or p.user.username,
                 'subtitle': p.rol.capitalize(),
                 'image': p.foto.url if p.foto else None,
-                'url': "/perfil" if p.user == request.user else f"/perfil/{p.id}"
+                'url': "/perfil" if request.user.is_authenticated and p.user == request.user else f"/perfil/{p.id}"
             })
 
         return Response({'results': results})

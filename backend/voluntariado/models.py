@@ -11,10 +11,10 @@ class Perfil(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil')
 
-    ROLES = [       
+    ROLES = [
         ('voluntario', 'Voluntario'),
         ('organizacion', 'Organizacion / Entidad'),
-        ('Administrador', 'Administrador de la plataforma'),
+        ('administrador', 'Administrador de la plataforma'),
     ]
 
     rol = models.CharField(max_length=20, choices=ROLES, default='voluntario')
@@ -225,5 +225,14 @@ class Patrocinadores(models.Model):
     class Meta:
         verbose_name = "Patrocinador"
         verbose_name_plural = "Patrocinadores"
+
+    def __str__(self) -> str:
+        """
+        Retorna el nombre del patrocinador.
+
+        Returns:
+            str: Nombre del patrocinador.
+        """
+        return self.nombre
 
 
