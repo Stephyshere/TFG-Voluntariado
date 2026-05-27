@@ -33,7 +33,7 @@ SECRET_KEY = os.environ.get(
 # Activar solo en desarrollo local con la variable de entorno DEBUG=True.
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.render.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.render.com', '.cgarcher.dev']
 
 # Permitir hosts adicionales del servidor de despliegue (Render, Dokploy, etc.)
 render_external_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
@@ -174,7 +174,7 @@ CORS_ALLOWED_ORIGINS = [
     origin.strip()
     for origin in os.environ.get(
         'CORS_ALLOWED_ORIGINS',
-        'http://localhost:5173,http://127.0.0.1:5173'
+        'http://localhost:5173,http://127.0.0.1:5173,https://voluntariado.cgarcher.dev'
     ).split(',')
     if origin.strip()
 ]
@@ -188,7 +188,7 @@ CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.environ.get(
         'CSRF_TRUSTED_ORIGINS',
-        'http://localhost:5173,http://127.0.0.1:5173'
+        'http://localhost:5173,http://127.0.0.1:5173,https://voluntariado.cgarcher.dev'
     ).split(',')
     if origin.strip()
 ]
