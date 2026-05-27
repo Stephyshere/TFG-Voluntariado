@@ -8,9 +8,12 @@ django.setup()
 
 from django.contrib.auth.models import User
 from voluntariado.models import Perfil, Pedania, Anuncio, Inscripcion
+from django.conf import settings
 
 def run():
     print("Iniciando la inserción de datos falsos...")
+    print(f"DEBUG - DATABASE_URL en el sistema: {os.environ.get('DATABASE_URL')}")
+    print(f"DEBUG - Base de datos configurada: {settings.DATABASES['default']['ENGINE']}")
     
     # 1. Asegurar pedanías y obtenerlas
     nombres_pedanias_base = ['Mazarrón', 'Puerto de Mazarrón', 'Bolnuevo', 'Pastrana', 'Morata', 'Ifre-Pastrana', 'Cañadas del Romero', 'Gañuelas', 'La Majada']
