@@ -212,3 +212,6 @@ EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
 
 # Configuracion DEFAULT_AUTO_FIELD para evitar warnings de Django
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Forzar a Django a que genere URLs con HTTPS cuando está detrás del proxy (Dokploy)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
