@@ -541,6 +541,10 @@ export default function Profile() {
                             <form onSubmit={handleSaveActivity} className="p-6 space-y-4">
                                 <Input label="Título" name="titulo" value={activityForm.titulo} onChange={handleActivityInputChange} required />
                                 <div className="space-y-1">
+                                    <label className="text-sm font-medium text-gray-700">Imagen de fondo</label>
+                                    <input type="file" accept="image/*" onChange={handleActivityImageChange} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100" />
+                                </div>
+                                <div className="space-y-1">
                                     <label className="text-sm font-medium text-gray-700">Descripción</label>
                                     <textarea name="descripcion" value={activityForm.descripcion} onChange={handleActivityInputChange} className="w-full border-gray-300 rounded-md shadow-sm focus:ring-brand-500 focus:border-brand-500" rows="3" required></textarea>
                                 </div>
