@@ -23,8 +23,8 @@ from voluntariado.models import Perfil, Pedania, Anuncio
 
 def download_random_image(seed: str) -> bytes:
     """
-    Descarga una imagen aleatoria desde picsum.photos asegurando
-    que sea única mediante el uso de una semilla (seed).
+    Descarga una imagen aleatoria desde loremflickr asegurando
+    que sea única mediante el uso de una semilla (seed) y con temática de voluntariado.
 
     Args:
         seed (str): Cadena de texto única para generar una imagen específica.
@@ -36,7 +36,11 @@ def download_random_image(seed: str) -> bytes:
         URLError: Si hay un problema de red o DNS al contactar al servidor.
         HTTPError: Si el servidor responde con un código de error HTTP.
     """
-    url = f"https://picsum.photos/seed/{seed}/800/600"
+    import hashlib
+    # Convertimos la semilla a un número entero para usar el parámetro lock de loremflickr
+    int_seed = int(hashlib.md5(seed.encode('utf-8')).hexdigest(), 16) % 100000
+    url = f"https://loremflickr.com/800/600/volunteer,charity,community?lock={int_seed}"
+    
     # Se añade un User-Agent para evitar rechazos del servidor
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     with urllib.request.urlopen(req) as response:
