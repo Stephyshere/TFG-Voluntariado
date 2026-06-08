@@ -83,7 +83,7 @@ def generate_activities() -> None:
     
     # 3. Datos de prueba para variabilidad
     etiquetas_disponibles = [etiqueta[0] for etiqueta in Anuncio.ETIQUETAS]
-    estados_disponibles = ['publicado', 'en_curso']
+    estados_disponibles = ['publicado', 'en_curso', 'finalizado']
     
     actividades_por_pedania = 3
     total_creadas = 0
@@ -147,6 +147,10 @@ def generate_activities() -> None:
                 usuario=user_org
             )
 
+            if anuncio.estado == 'finalizado':
+                anuncio.fecha_evento = timezone.now() - timedelta(days=random.randint(1, 30))
+                anuncio.noticia_resumen = f"¡Un éxito rotundo! La actividad de {titulo_base.lower()} concluyó satisfactoriamente gracias a la ayuda de nuestros voluntarios."
+
             # Generar semilla única para que picsum devuelva una imagen distinta siempre
             semilla_imagen = f"ped_{pedania.id}_ind_{indice}_rnd_{random.randint(1000, 9999)}"
             print(f"  - Obteniendo imagen para: {titulo}")
@@ -165,8 +169,15 @@ def generate_activities() -> None:
             try:
                 contenido_imagen = download_random_image(semilla_imagen, keyword_imagen)
                 nombre_archivo = f"img_{semilla_imagen}.jpg"
-                # Save=False porque luego llamamos a anuncio.save() manualmente
                 anuncio.imagen.save(nombre_archivo, ContentFile(contenido_imagen), save=False)
+                
+                # Si está finalizada, descargamos también una imagen para la noticia
+                if anuncio.estado == 'finalizado':
+                    semilla_noticia = f"news_{semilla_imagen}"
+                    print(f"  - Obteniendo imagen de noticia para: {titulo}")
+                    contenido_noticia = download_random_image(semilla_noticia, keyword_imagen)
+                    anuncio.noticia_imagen.save(f"news_{nombre_archivo}", ContentFile(contenido_noticia), save=False)
+                    
             except HTTPError as http_err:
                 print(f"    [!] Error HTTP al descargar imagen para {titulo}: {http_err.code}")
             except URLError as url_err:
