@@ -47,9 +47,10 @@ def generate_users_and_enrollments() -> None:
     usuarios_procesados = 0
 
     try:
-        # Usamos transaction.atomic para asegurar que todo se guarda de forma íntegra
         with transaction.atomic():
-            # 1. Crear organizaciones
+            # 1. Crear organizaciones y repartirles la autoría de los anuncios existentes
+            anuncios_para_repartir = list(anuncios_disponibles) # Copia para ir repartiendo
+            
             for indice in range(organizaciones_cantidad):
                 username = f'org_ficticia_{indice+1}'
                 user, created = User.objects.get_or_create(
@@ -66,6 +67,23 @@ def generate_users_and_enrollments() -> None:
                         telefono=f'60010020{indice}'
                     )
                     usuarios_procesados += 1
+                
+                # Repartimos equitativamente las actividades generadas previamente
+                if anuncios_para_repartir:
+                    # Calculamos cuántas tocan por organización para que se repartan todas
+                    porcion = len(anuncios_disponibles) // organizaciones_cantidad
+                    # Si es la última organización, le damos todas las que sobren
+                    if indice == organizaciones_cantidad - 1:
+                        anuncios_asignados = anuncios_para_repartir
+                    else:
+                        anuncios_asignados = anuncios_para_repartir[:porcion]
+                        
+                    for anuncio in anuncios_asignados:
+                        anuncio.usuario = user
+                        anuncio.save()
+                    
+                    if indice != organizaciones_cantidad - 1:
+                        del anuncios_para_repartir[:porcion]
 
             # 2. Crear voluntarios y asignar inscripciones para conseguir los rangos
             for rango_nombre, configuracion in configuracion_rangos.items():
