@@ -82,18 +82,50 @@ def generate_activities() -> None:
     actividades_por_pedania = 3
     total_creadas = 0
 
+    # Banco de textos realistas asociados a cada etiqueta
+    textos_realistas = {
+        'medio_ambiente': [
+            ("Limpieza de costas y playas", "Únete a nuestra jornada de recogida de plásticos y residuos en la costa para proteger el ecosistema marino local. ¡Cuidemos nuestro entorno!"),
+            ("Reforestación del monte bajo", "Vamos a plantar especies autóctonas en las zonas afectadas por la sequía. Tu ayuda es vital para recuperar la flora de la región."),
+            ("Taller de reciclaje y concienciación", "Ayúdanos a organizar e impartir charlas prácticas sobre la correcta separación de residuos en el centro comunitario.")
+        ],
+        'educacion': [
+            ("Apoyo escolar para menores", "Buscamos voluntarios para ayudar con los deberes y dar apoyo académico a niños de familias vulnerables durante las tardes."),
+            ("Campaña de fomento de la lectura", "Colabora en la biblioteca organizando cuentacuentos y dinámicas de lectura para despertar el interés de los más pequeños."),
+            ("Alfabetización digital para adultos", "Enseña el uso básico de ordenadores y teléfonos móviles a personas mayores con el objetivo de reducir la brecha digital.")
+        ],
+        'salud': [
+            ("Acompañamiento en el hospital", "Acompaña a personas mayores que se encuentran solas durante su estancia en el hospital. Tu simple compañía marca una gran diferencia."),
+            ("Apoyo logístico en donación de sangre", "Necesitamos voluntarios para la unidad móvil de donación. Informaremos a los vecinos, organizaremos las colas y repartiremos refrigerios."),
+            ("Jornada de primeros auxilios", "Ayuda a preparar el material, gestionar inscripciones y acomodar el espacio para el curso intensivo impartido por profesionales sanitarios.")
+        ],
+        'comunidad': [
+            ("Reparto solidario de alimentos", "Colabora en la organización, clasificación y entrega equitativa de los lotes del banco de alimentos a las familias más necesitadas del barrio."),
+            ("Renovación del centro cívico", "El centro vecinal necesita una mano de pintura y pequeñas reparaciones en su mobiliario. Tráete ropa de trabajo y ganas de colaborar en equipo."),
+            ("Organización de fiestas vecinales", "Ayúdanos a montar las carpas, preparar los juegos infantiles tradicionales y coordinar las distintas actividades de nuestras fiestas locales.")
+        ],
+        'animales': [
+            ("Paseo y socialización de perros", "Ven al refugio a pasear a los perros rescatados. Esta actividad les ayuda enormemente a rebajar su estrés y mejorar su sociabilidad para encontrar una familia."),
+            ("Mantenimiento de refugio felino", "Necesitamos manos dispuestas para limpiar instalaciones, arreglar casetas y asegurar que las colonias controladas de gatos tienen alimento fresco."),
+            ("Stand de concienciación sobre adopción", "Apóyanos gestionando el stand informativo para promover la adopción responsable de animales, repartiendo folletos y resolviendo dudas de los viandantes.")
+        ],
+        'otros': [
+            ("Asistencia en carrera solidaria", "Únete como voluntario apoyando en los puntos de avituallamiento, entrega de dorsales y control de cruces de nuestra carrera benéfica anual."),
+            ("Recogida masiva de ropa de abrigo", "Ayuda a recibir, clasificar por tallas y empaquetar abrigos y mantas donadas para personas sin recursos de cara a la llegada del invierno."),
+            ("Gestión de mercadillo benéfico", "Colabora atendiendo los puestos de nuestro mercadillo artesanal solidario durante este fin de semana. Todo lo recaudado irá a buenas causas.")
+        ]
+    }
+
     # 4. Generar los anuncios
     for pedania in pedanias_db:
         print(f"Generando actividades para la pedanía: {pedania.nombre}...")
         
         for indice in range(actividades_por_pedania):
             etiqueta_elegida = random.choice(etiquetas_disponibles)
-            titulo = f"Actividad de {etiqueta_elegida.replace('_', ' ').title()} en {pedania.nombre} ({indice+1})"
-            descripcion = (
-                f"Esta es una descripción detallada para la actividad '{titulo}'. "
-                "Necesitamos voluntarios comprometidos para llevar a cabo esta labor "
-                "tan importante para nuestra comunidad. ¡Anímate a participar y ayudar!"
-            )
+            titulo_base, descripcion_base = random.choice(textos_realistas.get(etiqueta_elegida, textos_realistas['otros']))
+            
+            titulo = f"{titulo_base} en {pedania.nombre}"
+            descripcion = descripcion_base
             requerimientos = "Ser mayor de edad, llevar ropa cómoda, botella de agua y muchas ganas."
             fecha_evento = timezone.now() + timedelta(days=random.randint(2, 60))
             
