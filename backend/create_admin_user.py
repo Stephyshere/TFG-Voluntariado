@@ -9,7 +9,7 @@ from voluntariado.models import Perfil
 
 def create_admin():
     username = 'admin'
-    password = 'admin123'
+    password = '1234'
     email = 'admin@example.com'
 
     if User.objects.filter(username=username).exists():
@@ -22,7 +22,7 @@ def create_admin():
         user = User.objects.create_superuser(username=username, email=email, password=password)
         
     # Asegurar que el perfil exista
-    Perfil.objects.get_or_create(user=user, rol='Administrador', nombre_entidad='Ayuntamiento de Mazarrón')
+    Perfil.objects.get_or_create(user=user, rol='administrador', nombre_entidad='Ayuntamiento de Mazarrón')
     
     print(f"Usuario '{username}' configurado correctamente con contraseña '{password}'")
 
