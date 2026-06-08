@@ -2,23 +2,30 @@
  * Utilidades para la gestión de avatares y fotos de perfil de los usuarios.
  */
 
-// Lista de 5 imágenes divertidas y de alta calidad de Unsplash para avatares por defecto
-const FUNNY_AVATARS = [
-    "https://images.unsplash.com/photo-1574873568924-e1dcd48a5763?q=80&w=400&auto=format&fit=crop", // Alpaca mirando fijamente
-    "https://images.unsplash.com/photo-1546182990-dffeafbe841d?q=80&w=400&auto=format&fit=crop", // León bostezando / rugiendo gracioso
-    "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?q=80&w=400&auto=format&fit=crop", // Shiba Inu con gafas
-    "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=400&auto=format&fit=crop", // Panda rojo bostezando tiernamente
-    "https://images.unsplash.com/photo-1540573133827-2e116694cede?q=80&w=400&auto=format&fit=crop"  // Mono sorprendido en primer plano
-];
-
 /**
- * Obtiene una foto de perfil divertida por defecto basada de forma estable en el ID del usuario.
+ * Obtiene un avatar predefinido con las iniciales del usuario.
  * 
- * @param {number|string} userId - El identificador único del usuario.
- * @returns {string} La URL de la imagen de Unsplash asignada al usuario de forma consistente.
+ * @param {Object} user - El objeto de usuario que contiene nombre, username o entidad.
+ * @returns {string} La URL de la imagen de ui-avatars.
  */
-export const getFunnyDefaultAvatar = (userId) => {
-    const id = parseInt(userId, 10) || 0;
-    const index = id % FUNNY_AVATARS.length;
-    return FUNNY_AVATARS[index];
+export const getDefaultAvatar = (user) => {
+    if (!user) return 'https://ui-avatars.com/api/?name=U&background=random&color=fff&size=200';
+    
+    let name = 'Usuario';
+    
+    // Si es una organización
+    if (user.nombre_entidad) {
+        name = user.nombre_entidad;
+    } 
+    // Si tiene nombre completo
+    else if (user.first_name || user.last_name) {
+        name = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+    } 
+    // Si solo tiene username
+    else if (user.username) {
+        name = user.username;
+    }
+
+    const formattedName = encodeURIComponent(name);
+    return `https://ui-avatars.com/api/?name=${formattedName}&background=random&color=fff&size=200&bold=true`;
 };

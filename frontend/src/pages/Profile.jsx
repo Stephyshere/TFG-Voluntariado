@@ -7,7 +7,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { User, Mail, Calendar, MapPin, Phone, Briefcase, Camera, X, Edit2, ShieldCheck, Newspaper, Sparkles, Image as ImageIcon, Trash2, CheckCircle2 } from 'lucide-react';
 import VerifiedBadge from '../components/ui/VerifiedBadge';
-import { getFunnyDefaultAvatar } from '../utils/avatar';
+import { getDefaultAvatar } from '../utils/avatar';
 
 export default function Profile() {
     const { id } = useParams();
@@ -314,9 +314,9 @@ export default function Profile() {
                         <div className="relative flex justify-between items-end -mt-12 mb-6">
                             <div className="relative">
                                 <div className={`h-28 w-28 rounded-full border-4 border-white bg-white overflow-hidden shadow-md transition-all duration-300 ${profileUser.marco && profileUser.marco !== 'ninguno' ? `frame-${profileUser.marco}` : ''}`}>
-                                    <img 
-                                        src={profileUser.foto || getFunnyDefaultAvatar(profileUser.user?.id)} 
-                                        alt="Perfil" 
+                                        <img 
+                                            src={profileUser.foto || getDefaultAvatar(profileUser.user || profileUser)} 
+                                            alt="Perfil" 
                                         className="h-full w-full object-cover" 
                                     />
                                 </div>
@@ -509,7 +509,7 @@ export default function Profile() {
                                     <div className="relative h-24 w-24">
                                         <div className={`h-24 w-24 rounded-full overflow-hidden border-2 border-gray-200 ${profileUser.marco && profileUser.marco !== 'ninguno' ? `frame-${profileUser.marco} scale-95` : ''}`}>
                                             <img 
-                                                src={previewImage || profileUser.foto || getFunnyDefaultAvatar(profileUser.user?.id)} 
+                                                src={previewImage || profileUser.foto || getDefaultAvatar(profileUser.user || profileUser)} 
                                                 alt="Vista previa" 
                                                 className="h-full w-full object-cover" 
                                             />

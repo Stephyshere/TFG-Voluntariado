@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/Button';
 import VerifiedBadge from './ui/VerifiedBadge';
 import axiosInstance from '../api/axiosInstance';
-import { getFunnyDefaultAvatar } from '../utils/avatar';
+import { getDefaultAvatar } from '../utils/avatar';
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
@@ -175,7 +175,7 @@ export default function Navbar() {
                                 <Link to="/perfil" className="flex items-center gap-3 group hover:bg-gray-50 p-1 pr-3 rounded-full transition-all">
                                     <div className={`h-10 w-10 rounded-full border-2 border-white bg-white overflow-hidden shadow-sm transition-all duration-300 ${user.marco && user.marco !== 'ninguno' ? `frame-${user.marco} scale-95` : ''}`}>
                                         <img 
-                                            src={user.foto || getFunnyDefaultAvatar(user.id)} 
+                                            src={user.foto || getDefaultAvatar(user)} 
                                             alt="Perfil" 
                                             className="h-full w-full object-cover" 
                                         />
@@ -282,7 +282,7 @@ export default function Navbar() {
                                 <Link to="/perfil" onClick={() => setIsOpen(false)} className="flex items-center p-3 bg-gray-50 rounded-xl mb-4 border border-gray-100">
                                     <div className={`h-12 w-12 rounded-full border-2 border-white bg-white overflow-hidden shadow-sm transition-all duration-300 ${user.marco && user.marco !== 'ninguno' ? `frame-${user.marco} scale-95` : ''}`}>
                                         <img 
-                                            src={user.foto || getFunnyDefaultAvatar(user.id)} 
+                                            src={user.foto || getDefaultAvatar(user)} 
                                             alt="Perfil" 
                                             className="h-full w-full object-cover" 
                                         />
