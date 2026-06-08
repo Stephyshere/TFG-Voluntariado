@@ -21,14 +21,14 @@ django.setup()
 from django.contrib.auth.models import User
 from voluntariado.models import Perfil, Pedania, Anuncio
 
-def download_random_image(seed: str) -> bytes:
+def download_random_image(seed: str, keyword: str) -> bytes:
     """
     Descarga una imagen aleatoria desde loremflickr asegurando
-    que sea única mediante el uso de una semilla (seed).
-    Se utilizan términos como ecology, teamwork o cleanup para evitar fotos de Navidad.
+    que sea única mediante el uso de una semilla (seed) y relacionándola con el tema.
 
     Args:
         seed (str): Cadena de texto única para generar una imagen específica.
+        keyword (str): Palabra clave (ej: ecology, animal) para filtrar la temática.
 
     Returns:
         bytes: El contenido binario de la imagen.
@@ -41,11 +41,7 @@ def download_random_image(seed: str) -> bytes:
     # Convertimos la semilla a un número entero para usar el parámetro lock de loremflickr
     int_seed = int(hashlib.md5(seed.encode('utf-8')).hexdigest(), 16) % 100000
     
-    # Lista de categorías para rotar según el seed y asegurar variedad y relevancia
-    categorias = ["ecology", "teamwork", "cleanup", "ngo", "planting", "community"]
-    categoria = categorias[int_seed % len(categorias)]
-    
-    url = f"https://loremflickr.com/800/600/{categoria}?lock={int_seed}"
+    url = f"https://loremflickr.com/800/600/{keyword}?lock={int_seed}"
     
     # Se añade un User-Agent para evitar rechazos del servidor
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -155,8 +151,19 @@ def generate_activities() -> None:
             semilla_imagen = f"ped_{pedania.id}_ind_{indice}_rnd_{random.randint(1000, 9999)}"
             print(f"  - Obteniendo imagen para: {titulo}")
             
+            # Asociamos un keyword de búsqueda según la etiqueta de la actividad
+            mapa_keywords = {
+                'medio_ambiente': 'nature,ecology',
+                'educacion': 'education,school,reading',
+                'salud': 'hospital,health',
+                'comunidad': 'community,teamwork',
+                'animales': 'animal,dog,cat,pet',
+                'otros': 'charity,event,volunteer'
+            }
+            keyword_imagen = mapa_keywords.get(etiqueta_elegida, 'community')
+
             try:
-                contenido_imagen = download_random_image(semilla_imagen)
+                contenido_imagen = download_random_image(semilla_imagen, keyword_imagen)
                 nombre_archivo = f"img_{semilla_imagen}.jpg"
                 # Save=False porque luego llamamos a anuncio.save() manualmente
                 anuncio.imagen.save(nombre_archivo, ContentFile(contenido_imagen), save=False)
