@@ -24,7 +24,8 @@ from voluntariado.models import Perfil, Pedania, Anuncio
 def download_random_image(seed: str) -> bytes:
     """
     Descarga una imagen aleatoria desde loremflickr asegurando
-    que sea única mediante el uso de una semilla (seed) y con temática de voluntariado.
+    que sea única mediante el uso de una semilla (seed).
+    Se utilizan términos como ecology, teamwork o cleanup para evitar fotos de Navidad.
 
     Args:
         seed (str): Cadena de texto única para generar una imagen específica.
@@ -39,7 +40,12 @@ def download_random_image(seed: str) -> bytes:
     import hashlib
     # Convertimos la semilla a un número entero para usar el parámetro lock de loremflickr
     int_seed = int(hashlib.md5(seed.encode('utf-8')).hexdigest(), 16) % 100000
-    url = f"https://loremflickr.com/800/600/volunteer,charity,community?lock={int_seed}"
+    
+    # Lista de categorías para rotar según el seed y asegurar variedad y relevancia
+    categorias = ["ecology", "teamwork", "cleanup", "ngo", "planting", "community"]
+    categoria = categorias[int_seed % len(categorias)]
+    
+    url = f"https://loremflickr.com/800/600/{categoria}?lock={int_seed}"
     
     # Se añade un User-Agent para evitar rechazos del servidor
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
